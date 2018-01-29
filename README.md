@@ -4,7 +4,7 @@ A module for ProcessWire CMS/CMF. Adds a method for Pageimages that resizes to a
 
 ## Example use
 
-You are creating a lightbox gallery. For the enlargements, rather than setting a fixed maximum width or height you want all the enlargements have the same size in terms of area, allowing a panoramic image to be wider than a square image, for instance.
+You are creating a lightbox gallery of images with different aspect ratios. For the enlargements, rather than setting a fixed maximum width or height you want all the enlargements have the same size in terms of area, allowing a panoramic image to be wider than a square image, for instance.
 
 The effect of resizing three different aspect ratios by the same megapixel target value can be seen in the screenshot below:
 
