@@ -1,6 +1,6 @@
 # Image Megapixels
 
-A module for ProcessWire CMS/CMF. Adds a method for Pageimages that resizes to a target megapixel value.
+A module for ProcessWire CMS/CMF. Adds methods to Pageimage objects useful for resizing to a target megapixel value.
 
 ## Example use
 
