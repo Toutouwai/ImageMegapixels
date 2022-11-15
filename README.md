@@ -6,6 +6,8 @@ A module for ProcessWire CMS/CMF. Adds methods to Pageimage objects useful for r
 
 You are creating a lightbox gallery of images with different aspect ratios. For the enlargements, rather than setting a fixed maximum width or height you want all the enlargements have the same size in terms of area, allowing a panoramic image to be wider than a square image, for instance.
 
+Another use case is sizing a gallery of sponsor logos. The supplied logos are different aspect ratios but you need to ensure the logos are sized so each has equal prominence on the page.
+
 The effect of resizing three different aspect ratios by the same megapixel target value can be seen in the screenshot below:
 
 ![megapixels](https://user-images.githubusercontent.com/1538852/35495012-749cb392-0523-11e8-81d1-4a8beb68eaf3.jpg)
