@@ -33,3 +33,20 @@ foreach($page->images as $image) {
 ```
 
 If needed you can supply an array of [options for Pageimage::size()](https://processwire.com/api/ref/page-image/size/) as a second argument.
+
+### Getting dimensions
+
+If you just want to get the height and width dimensions needed to size an image to the given number of megapixels you can use the `Pageimage::megapixelsDimensions()` method that this module also adds. It returns an array with `width` and `height` as keys.
+
+Example of how this could be used to output a gallery of logos:
+
+```php
+foreach($page->logos as $logo) {
+    $dimensions = $logo->megapixelsDimensions(0.01);
+    $width = $dimensions['width'];
+    $height = $dimensions['height'];
+    $width2x = $width * 2;
+    $height2x = $height * 2;
+    echo "<img src='{$logo->size($width, $height)->url}' srcset='{$logo->size($width, $height)->url} 1x, {$logo->size($width2x, $height2x)->url} 2x' alt='Logo' width='$width' height='$height'>";
+}
+```

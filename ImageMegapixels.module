@@ -1,20 +1,5 @@
 <?php namespace ProcessWire;
 
-/**
- *
- * Image Megapixels
- *
- * @author Robin Sallis
- *
- * ProcessWire 3.x
- * Copyright (C) 2011 by Ryan Cramer
- * Licensed under GNU/GPL v2, see LICENSE.TXT
- *
- * http://www.processwire.com
- * http://www.ryancramer.com
- *
- */
-
 class ImageMegapixels extends WireData implements Module {
 
 	/**
@@ -23,12 +8,13 @@ class ImageMegapixels extends WireData implements Module {
 	public static function getModuleInfo() {
 		return array(
 			'title' => "Image Megapixels",
-			'summary' => 'Adds a method for Pageimages that resizes to a target megapixel value.',
-			'version' => '0.1.0',
+			'summary' => 'Adds methods to Pageimage objects useful for resizing to a target megapixel value.',
+			'version' => '0.2.0',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/ImageMegapixels',
 			'icon' => 'arrows-alt',
 			'autoload' => true,
+			'requires' => 'ProcessWire>=3.0.0, PHP>=5.4.0',
 		);
 	}
 
@@ -37,19 +23,20 @@ class ImageMegapixels extends WireData implements Module {
 	 */
 	public function ready() {
 		$this->addHookMethod('Pageimage::megapixels', $this, 'megapixels');
+		$this->addHookMethod('Pageimage::megapixelsDimensions', $this, 'megapixelsDimensions');
 	}
 
 	/**
-	 * Return an image (Pageimage) resized to a target megapixel value
+	 * Get a Pageimage resized to a target megapixel value
 	 *
 	 * @param HookEvent $event
 	 */
 	public function megapixels(HookEvent $event) {
 
-		/* @var Pageimage $pageimage */
+		/** @var Pageimage $pageimage */
 		$pageimage = $event->object;
 		$megapixels = $event->arguments(0);
-		$options = $event->arguments(1) ?: array(); // ImageSizer options if any
+		$options = $event->arguments(1) ?: []; // ImageSizer options if any
 
 		// Return unmodified Pageimage if first argument not supplied
 		if(!$megapixels) {
@@ -61,18 +48,56 @@ class ImageMegapixels extends WireData implements Module {
 		$image_width = $pageimage->width;
 		$image_height = $pageimage->height;
 
-		// Return unmodified Pageimage if smaller than target megapixels
-		if($image_width * $image_height <= $pixels) {
+		// Return unmodified Pageimage if smaller than target megapixels if image upscaling disabled
+		if(!$this->wire()->config->imageSizerOptions('upscaling') && $image_width * $image_height <= $pixels) {
 			$event->return = $pageimage;
 			return;
 		}
 
+		$dimensions = $this->getMegapixelsDimensions($pageimage, $megapixels);
+
+		$event->return = $pageimage->size($dimensions['width'], round($dimensions['height']), $options);
+	}
+
+	/**
+	 * Hook method
+	 * Get the width and height needed to resize a Pageimage to a target megapixel value
+	 *
+	 * @param HookEvent $event
+	 */
+	public function megapixelsDimensions(HookEvent $event) {
+		/** @var Pageimage $pageimage */
+		$pageimage = $event->object;
+		$megapixels = $event->arguments(0);
+		$event->return = $this->getMegapixelsDimensions($pageimage, $megapixels);
+	}
+
+	/**
+	 * Get the width and height needed to resize a Pageimage to a target megapixel value
+	 *
+	 * @param Pageimage $pageimage
+	 * @param int $megapixels
+	 * @return array
+	 */
+	protected function getMegapixelsDimensions(Pageimage $pageimage, $megapixels) {
+
+		$out = [
+			'width' => null,
+			'height' => null,
+		];
+
+		// Return null values if first argument not supplied
+		if(!$megapixels) return $out;
+
+		$pixels = $megapixels * 1000000;
+		$image_width = $pageimage->width;
+		$image_height = $pageimage->height;
+
 		$ratio = $image_height / $image_width;
-		$new_width = sqrt($pixels / $ratio);
-		$new_height = $new_width * $ratio;
+		$out['width'] = (int) round(sqrt($pixels / $ratio));
+		$out['height'] = (int) round($out['width'] * $ratio);
 
-		$event->return = $pageimage->size(round($new_width), round($new_height), $options);
-
+		return $out;
 	}
 
 }
