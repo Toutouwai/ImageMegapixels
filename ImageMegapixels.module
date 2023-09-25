@@ -9,7 +9,7 @@ class ImageMegapixels extends WireData implements Module {
 		return array(
 			'title' => "Image Megapixels",
 			'summary' => 'Adds methods to Pageimage objects useful for resizing to a target megapixel value.',
-			'version' => '0.2.0',
+			'version' => '0.2.1',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/ImageMegapixels',
 			'icon' => 'arrows-alt',
@@ -92,6 +92,12 @@ class ImageMegapixels extends WireData implements Module {
 		$pixels = $megapixels * 1000000;
 		$image_width = $pageimage->width;
 		$image_height = $pageimage->height;
+		// Try again to get dimensions if invalid dimensions are in the database
+		if($image_width === '100%') {
+			$info = $pageimage->getImageInfo(true);
+			$image_width = $info['width'];
+			$image_height = $info['height'];
+		}
 
 		$ratio = $image_height / $image_width;
 		$out['width'] = (int) round(sqrt($pixels / $ratio));
